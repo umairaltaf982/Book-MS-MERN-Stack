@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5004/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004/api';
 
 // Create axios instance
 const api = axios.create({
@@ -26,6 +26,7 @@ api.interceptors.request.use(
 export const userService = {
   register: (userData) => api.post('/users/register', userData),
   login: (credentials) => api.post('/users/login', credentials),
+  getCart: () => api.get('/users/get-cart'),
   addToCart: (bookId) => api.put('/users/add-to-cart', { bookId }),
   removeFromCart: (bookId) => api.put('/users/remove-from-cart', { bookId }),
   addToWishlist: (bookId) => api.put('/users/add-to-wishlist', { bookId }),

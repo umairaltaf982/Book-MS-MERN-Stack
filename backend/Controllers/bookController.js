@@ -22,7 +22,7 @@ const getBook = async (req, res) => {
     }
 }
 
-const getBooks = async (req, res) => {
+const getBooks = async (_, res) => {
     try {
         const books = await Book.find();
         res.status(200).json({
@@ -50,7 +50,7 @@ const searchBooks = async (req, res) => {
 
         // Create a regex for case-insensitive search
         const searchRegex = new RegExp(query, 'i');
-        
+
         // Search in title and author fields
         const books = await Book.find({
             $or: [

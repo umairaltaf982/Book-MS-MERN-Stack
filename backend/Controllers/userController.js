@@ -33,18 +33,13 @@ const loginUser = async (req, res) => {
             });
         }
         // const isMatch = await user.matchPassword(password);
-        const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid credentials'
             });
         }
-        res.status(200).json({
-            success: true,
-            message: 'Login successful',
-            user
-        });
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
             expiresIn: process.env.JWT_EXPIRE
@@ -201,22 +196,22 @@ const buyBook = async (req, res) => {
 //     try {
 //         const { email } = req.body;
 //         const user = await User.findOne({ email });
-        
+
 //         if (!user) {
 //             return res.status(404).json({
 //                 success: false,
 //                 message: 'User not found'
 //             });
 //         }
-        
+
 //         // Generate a 6-digit OTP
 //         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        
+
 //         // Store OTP in user document with expiry (15 minutes)
 //         user.resetPasswordOtp = otp;
 //         user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 minutes
 //         await user.save();
-        
+
 //         // In a real application, you would send an email with the OTP
 //         // For now, we'll just return it in the response (for testing)
 //         res.status(200).json({
@@ -237,25 +232,25 @@ const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         const user = await User.findOne({ email });
-        
+
         if (!user) {
             return res.status(404).json({
                 success: false,
                 message: 'User not found'
             });
         }
-        
+
         // Generate a 6-digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        
+
         // Store OTP in user document with expiry (15 minutes)
         user.resetPasswordOtp = otp;
         user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 minutes
         await user.save();
-        
+
         // Send email with OTP
         const nodemailer = require('nodemailer');
-        
+
         // Create a transporter using Gmail
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -264,7 +259,7 @@ const forgotPassword = async (req, res) => {
                 pass: process.env.EMAIL_PASSWORD
             }
         });
-        
+
         // Email content
         const mailOptions = {
             from: process.env.EMAIL_USERNAME,
@@ -272,10 +267,10 @@ const forgotPassword = async (req, res) => {
             subject: 'Password Reset OTP',
             text: `Your OTP for password reset is: ${otp}. This OTP will expire in 15 minutes.`
         };
-        
+
         // Send email
         await transporter.sendMail(mailOptions);
-        
+
         res.status(200).json({
             success: true,
             message: 'Password reset OTP sent to your email'
@@ -291,33 +286,49 @@ const forgotPassword = async (req, res) => {
 const verifyOtpAndResetPassword = async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
-        
-        const user = await User.findOne({ 
+
+        const user = await User.findOne({
             email,
             resetPasswordOtp: otp,
             resetPasswordExpire: { $gt: Date.now() }
         });
-        
+
         if (!user) {
             return res.status(400).json({
                 success: false,
                 message: 'Invalid or expired OTP'
             });
         }
-        
+
         // Hash the new password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);
-        
+
         // Update password and clear reset fields
         user.password = hashedPassword;
         user.resetPasswordOtp = undefined;
         user.resetPasswordExpire = undefined;
         await user.save();
-        
+
         res.status(200).json({
             success: true,
             message: 'Password reset successful'
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+}
+
+const getCart = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).populate('cart');
+        res.status(200).json({
+            success: true,
+            message: 'Cart fetched successfully',
+            cart: user.cart
         });
     } catch (error) {
         res.status(400).json({
@@ -336,5 +347,6 @@ module.exports = {
     removeFromWishlist,
     buyBook,
     forgotPassword,
-    verifyOtpAndResetPassword
+    verifyOtpAndResetPassword,
+    getCart
 }

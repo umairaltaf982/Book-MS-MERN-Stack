@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import menuIcon from '../assets/menu.png' // Make sure this file exists
+import menuIcon from '../assets/menu.png'
 
 function SideMenuScroll() {
   const [isOpen, setIsOpen] = useState(false)
@@ -31,7 +31,8 @@ function SideMenuScroll() {
       <div className={`side-menu ${isOpen ? 'open' : ''}`}>
         {(isLoggedIn ? (
           <>
-            <Link to="/">Home</Link>            
+            <Link to="/">Home</Link>
+            <Link to="/bookstores">Bookstores</Link>
             <Link to="/cart">Cart</Link>
             <Link to="/wishlist">Wishlist</Link>
             <button onClick={handleLogout}>Logout</button>
@@ -39,6 +40,7 @@ function SideMenuScroll() {
         ) : (
           <>
             <Link to="/">Home</Link>
+            <Link to="/bookstores">Bookstores</Link>
             <Link to="/login">Login</Link>
             <Link to="/register">Register</Link>
           </>

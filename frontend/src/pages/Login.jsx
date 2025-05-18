@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { userService } from '../services/api'
 
@@ -12,11 +12,19 @@ function Login() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    
+
     try {
       const response = await userService.login({ email, password })
-      localStorage.setItem('token', response.data.token)
-      window.location.href = '/'
+      console.log('Login response:', response.data)
+
+      // Make sure the token exists in the response
+      if (response.data && response.data.token) {
+        localStorage.setItem('token', response.data.token)
+        window.location.href = '/'
+      } else {
+        setError('Invalid response from server. Please try again.')
+        console.error('No token in response:', response.data)
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to login')
       console.error(err)
@@ -35,11 +43,11 @@ function Login() {
       <button className="google-login-button" onClick={handleGoogleLogin}>
         Continue with Google
       </button>
-      
+
       <div className="login-divider">
         <span>OR</span>
       </div>
-      
+
       <form className="login-form" onSubmit={handleLogin}>
         <input
           type="email"
@@ -57,8 +65,8 @@ function Login() {
           required
           disabled={loading}
         />
-        <button 
-          className="login-button" 
+        <button
+          className="login-button"
           type="submit"
           disabled={loading}
         >

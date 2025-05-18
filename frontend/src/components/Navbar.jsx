@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import Searchbar from './Searchbar'
-import assets from '../assets/menu.png';
 
 function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -29,6 +28,7 @@ function Navbar() {
       <div className="navbar-menu">
         <Searchbar />
         <Link to="/">Home</Link>
+        <Link to="/bookstores">Bookstores</Link>
         {isLoggedIn ? (
           <>
             <Link to="/cart">Cart</Link>

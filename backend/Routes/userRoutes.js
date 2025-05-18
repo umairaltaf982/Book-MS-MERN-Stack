@@ -12,5 +12,6 @@ router.put('/remove-from-wishlist', authMiddleware.protectUser, userController.r
 router.put('/buy-book', authMiddleware.protectUser, userController.buyBook);
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.verifyOtpAndResetPassword);
+router.get('/get-cart', authMiddleware.protectUser, userController.getCart);
 
 module.exports = router;
