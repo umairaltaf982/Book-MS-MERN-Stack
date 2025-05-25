@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004/api';
+const ORDER_SERVICE_URL = import.meta.env.VITE_ORDER_SERVICE_URL || 'http://localhost:5006/api';
 
-// Create axios instance
+// Create axios instances
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -10,25 +11,29 @@ const api = axios.create({
   }
 });
 
+const orderApi = axios.create({
+  baseURL: ORDER_SERVICE_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
 // Add auth token to requests
-api.interceptors.request.use(
-  (config) => {
-    // Check if the request is for admin endpoints
-    const isAdminRequest = config.url.includes('/admin/');
+const addAuthToken = (config) => {
+  const isAdminRequest = config.url.includes('/admin/');
+  const token = isAdminRequest
+    ? localStorage.getItem('adminToken')
+    : localStorage.getItem('token');
 
-    // Get the appropriate token based on the request type
-    const token = isAdminRequest
-      ? localStorage.getItem('adminToken')
-      : localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+  return config;
+};
 
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+api.interceptors.request.use(addAuthToken, (error) => Promise.reject(error));
+orderApi.interceptors.request.use(addAuthToken, (error) => Promise.reject(error));
 
 // API services
 export const userService = {
@@ -62,6 +67,22 @@ export const adminService = {
   deleteUser: (id) => api.delete(`/admin/delete-user/${id}`),
   updateUser: (id, userData) => api.put(`/admin/update-user/${id}`, userData),
   addContact: (contactData) => api.post('/admin/add-contact', contactData)
+};
+
+// New Order Service
+export const orderService = {
+  // Customer order operations
+  createOrder: (orderData) => orderApi.post('/orders', orderData),
+  getUserOrders: (userId) => orderApi.get(`/orders/user/${userId}`),
+  getOrderById: (orderId) => orderApi.get(`/orders/${orderId}`),
+  cancelOrder: (orderId) => orderApi.patch(`/orders/${orderId}/cancel`),
+  
+  // Admin order operations
+  getAllOrders: () => orderApi.get('/orders'),
+  updateOrderStatus: (orderId, status) => 
+    orderApi.patch(`/orders/${orderId}/status`, { status }),
+  updatePaymentStatus: (orderId, paymentStatus) => 
+    orderApi.patch(`/orders/${orderId}/payment`, { paymentStatus })
 };
 
 export default api;
