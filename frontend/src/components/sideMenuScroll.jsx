@@ -1,10 +1,13 @@
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import menuIcon from '../assets/menu.png'
 
 function SideMenuScroll() {
   const [isOpen, setIsOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const location = useLocation()
+  const isAdminRoute = location.pathname.startsWith('/admin')
 
   useEffect(() => {
     // Check if user is logged in
@@ -21,6 +24,11 @@ function SideMenuScroll() {
 
   const handleToggle = () => {
     setIsOpen(!isOpen)
+  }
+
+
+  if(isAdminRoute){
+    return null
   }
 
   return (
