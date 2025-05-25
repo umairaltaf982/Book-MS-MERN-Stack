@@ -13,10 +13,18 @@ const api = axios.create({
 // Add auth token to requests
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    // Check if the request is for admin endpoints
+    const isAdminRequest = config.url.includes('/admin/');
+
+    // Get the appropriate token based on the request type
+    const token = isAdminRequest
+      ? localStorage.getItem('adminToken')
+      : localStorage.getItem('token');
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -27,6 +35,7 @@ export const userService = {
   register: (userData) => api.post('/users/register', userData),
   login: (credentials) => api.post('/users/login', credentials),
   getCart: () => api.get('/users/get-cart'),
+  getWishlist: () => api.get('/users/get-wishlist'),
   addToCart: (bookId) => api.put('/users/add-to-cart', { bookId }),
   removeFromCart: (bookId) => api.put('/users/remove-from-cart', { bookId }),
   addToWishlist: (bookId) => api.put('/users/add-to-wishlist', { bookId }),
@@ -51,7 +60,8 @@ export const adminService = {
   getAllBooks: () => api.get('/admin/get-all-books'),
   getAllUsers: () => api.get('/admin/get-all-users'),
   deleteUser: (id) => api.delete(`/admin/delete-user/${id}`),
-  updateUser: (id, userData) => api.put(`/admin/update-user/${id}`, userData)
+  updateUser: (id, userData) => api.put(`/admin/update-user/${id}`, userData),
+  addContact: (contactData) => api.post('/admin/add-contact', contactData)
 };
 
 export default api;

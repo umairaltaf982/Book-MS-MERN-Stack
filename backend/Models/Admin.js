@@ -13,6 +13,21 @@ const AdminSchema = new mongoose.Schema({
         minlength: 8,
         match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/,'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character']
     },
+    contacts: [{
+        name: {
+            type: String,
+            required: true
+        },
+        phoneNumber: {
+            type: String,
+            required: true,
+            match: [/^\d{11}$/, 'Phone number must be exactly 11 digits']
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
     createdAt: {
         type: Date,
         default: Date.now,

@@ -13,5 +13,6 @@ router.put('/buy-book', authMiddleware.protectUser, userController.buyBook);
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.verifyOtpAndResetPassword);
 router.get('/get-cart', authMiddleware.protectUser, userController.getCart);
+router.get('/get-wishlist', authMiddleware.protectUser, userController.getWishlist);
 
 module.exports = router;

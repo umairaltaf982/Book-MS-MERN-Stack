@@ -1,13 +1,15 @@
+const dotenv = require('dotenv');
+// Load environment variables before importing other modules
+dotenv.config();
+
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const userRoutes = require('./Routes/userRoutes');
 const adminRoutes = require('./Routes/adminRoute');
 const bookRoutes = require('./Routes/bookRoute');
 const connectDB = require('./config/db');
 
 const app = express();
-dotenv.config();
 
 app.use(cors());
 app.use(express.json());

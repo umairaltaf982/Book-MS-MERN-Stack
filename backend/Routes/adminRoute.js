@@ -12,5 +12,6 @@ router.get('/get-all-books', authMiddleware.protectAdmin, adminController.getAll
 router.get('/get-all-users', authMiddleware.protectAdmin, adminController.getAllUsers);
 router.delete('/delete-user/:id', authMiddleware.protectAdmin, adminController.deleteUser);
 router.put('/update-user/:id', authMiddleware.protectAdmin, adminController.updateUser);
+router.post('/add-contact', adminController.addContact);
 
 module.exports = router;

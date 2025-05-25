@@ -204,6 +204,63 @@ const updateUser = async (req, res) => {
     }
 }
 
+const addContact = async (req, res) => {
+    try {
+        const { name, phoneNumber } = req.body;
+        
+        if (!name || !phoneNumber) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name and phone number are required'
+            });
+        }
+        
+        // Validate phone number format (11 digits)
+        if (!/^\d{11}$/.test(phoneNumber)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Phone number must be exactly 11 digits'
+            });
+        }
+        
+        // Find the admin (assuming there's only one admin or using the first one)
+        const admin = await Admin.findOne();
+        
+        if (!admin) {
+            return res.status(404).json({
+                success: false,
+                message: 'Admin not found'
+            });
+        }
+        
+        // Check if phone number already exists
+        const existingContact = admin.contacts.find(contact => 
+            contact.phoneNumber === phoneNumber
+        );
+        
+        if (existingContact) {
+            return res.status(400).json({
+                success: false,
+                message: 'Phone number already registered'
+            });
+        }
+        
+        // Add new contact
+        admin.contacts.push({ name, phoneNumber });
+        await admin.save();
+        
+        res.status(201).json({
+            success: true,
+            message: 'Contact added successfully'
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 module.exports = {
     registerAdmin,
     loginAdmin,
@@ -213,5 +270,6 @@ module.exports = {
     getAllBooks,
     getAllUsers,
     deleteUser,
-    updateUser
+    updateUser,
+    addContact
 }

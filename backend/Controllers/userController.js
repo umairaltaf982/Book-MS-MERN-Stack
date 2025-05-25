@@ -338,6 +338,22 @@ const getCart = async (req, res) => {
     }
 }
 
+const getWishlist = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).populate('wishlist');
+        res.status(200).json({
+            success: true,
+            message: 'Wishlist fetched successfully',
+            wishlist: user.wishlist
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message
+        });
+    }
+}
+
 module.exports = {
     registerUser,
     loginUser,
@@ -348,5 +364,6 @@ module.exports = {
     buyBook,
     forgotPassword,
     verifyOtpAndResetPassword,
-    getCart
+    getCart,
+    getWishlist
 }

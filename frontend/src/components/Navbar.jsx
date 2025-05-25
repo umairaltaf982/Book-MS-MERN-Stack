@@ -4,13 +4,18 @@ import Searchbar from './Searchbar'
 
 function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
+
   useEffect(() => {
     // Check if user is logged in
     const token = localStorage.getItem('token')
     setIsLoggedIn(!!token)
+
+    // Check if admin is logged in
+    const adminToken = localStorage.getItem('adminToken')
+    setIsAdminLoggedIn(!!adminToken)
   }, [])
-  
+
   const handleLogout = () => {
     localStorage.removeItem('token')
     setIsLoggedIn(false)
@@ -29,6 +34,13 @@ function Navbar() {
         <Searchbar />
         <Link to="/">Home</Link>
         <Link to="/bookstores">Bookstores</Link>
+
+        {isAdminLoggedIn ? (
+          <Link to="/admin/dashboard" className="admin-link">Admin Dashboard</Link>
+        ) : (
+          <Link to="/admin/login" className="admin-link">Admin</Link>
+        )}
+
         {isLoggedIn ? (
           <>
             <Link to="/cart">Cart</Link>
